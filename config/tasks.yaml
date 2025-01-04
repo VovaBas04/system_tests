@@ -1,0 +1,22 @@
+docker:
+  postgres:
+    host: postgres
+    port: 5432
+    username: postgres
+    password: postgres
+    name: tasks
+  redis:
+    host: cache
+    port: 6379
+localhost:
+  postgres:
+    host: localhost
+    port: 5436
+    username: postgres
+    password: postgres
+    name: tasks
+  redis:
+    host: localhost
+    port: 6380
+secret-token: ZmYwMTYzM2MtMzY0ZS00NzQ3LThjOGMtMjBjZjdhZTI0NmYzOjY5MjVmOTU3LWFjOTUtNGJlOC1iZGRkLTgxZTliMGE2ZDdlOQ==
+testcase: 5

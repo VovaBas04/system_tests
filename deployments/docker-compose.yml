@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  go:
+    build:
+      context:  ../
+      dockerfile:  build/go/Dockerfile
+    networks:
+      - my_network
+    ports:
+      - '8080:8080'
+    volumes:
+      - ..:/tasks
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tasks
+    volumes:
+      - pgdata_tasks:/var/lib/postgresql/data
+    networks:
+      - my_network
+    ports:
+      - "5436:5432"
+  redis:
+    image: docker.io/bitnami/redis:7.4
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - '6380:6379'
+    volumes:
+      - redisdata_tasks:/bitnami/cache/data
+volumes:
+  pgdata_tasks:
+    driver: local
+  redisdata_tasks:
+    driver: local
+networks:
+  my_network:
