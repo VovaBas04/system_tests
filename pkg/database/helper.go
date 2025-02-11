@@ -14,3 +14,14 @@ func SwitchDbByEnv() ConfigDb {
 		return &LocalhostDb{}
 	}
 }
+
+func SwitchReplicatedDbByEnv() ReplicateConfigDb {
+	switch os.Getenv("ENV") {
+	case "PROD":
+		return &ReplicatedLocalhostDb{}
+	case "DEV":
+		return &ReplicatedDockerDb{}
+	default:
+		return &ReplicatedLocalhostDb{}
+	}
+}

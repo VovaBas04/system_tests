@@ -24,6 +24,7 @@ func (mock *MockResponse) GetNeuronRawAnswer() string {
 
 func (mock *MockResponse) AdditionalLogicToHandleResponse() error {
 	args := mock.Called()
+
 	return args.Error(0)
 }
 
@@ -42,5 +43,4 @@ func (s *PostProcessResponseHandlerTestSuite) TestLogic() {
 
 func TestRun(t *testing.T) {
 	suite.Run(t, new(PostProcessResponseHandlerTestSuite))
-
 }

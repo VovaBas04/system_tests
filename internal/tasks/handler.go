@@ -6,11 +6,10 @@ import (
 	"ginProject1/internal/tasks/service"
 	"ginProject1/pkg/logger"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 )
 
-func Tasks(service service.IService, logger *logger.Logger) func(c *gin.Context) {
+func Tasks(taskService service.INeuronApiService, logger *logger.Logger) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request := &PromptRequest{}
 		err := c.ShouldBindJSON(request)
@@ -27,18 +26,22 @@ func Tasks(service service.IService, logger *logger.Logger) func(c *gin.Context)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		response, err := service.Do(gigaChatRequest)
+		response, err := taskService.Do(gigaChatRequest)
 		if err != nil {
 			logger.Error(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		gigaChatResponse, err := service.ReadNeuronModelAnswer(response)
-		log.Println(gigaChatResponse.GetNeuronRawAnswer())
+		gigaChatResponse, err := taskService.ReadNeuronModelAnswer(response)
 		if err != nil {
 			logger.Error(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
+		}
+
+		err = taskService.SaveAction(gigaChatRequest.Prompt, gigaChatResponse.GetNeuronRawAnswer())
+		if err != nil {
+			logger.Error(err)
 		}
 
 		testCases, err := postprocess.GetTestsByResponse(gigaChatResponse)
@@ -47,6 +50,19 @@ func Tasks(service service.IService, logger *logger.Logger) func(c *gin.Context)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, service.ToResponse(testCases))
+		c.JSON(http.StatusOK, taskService.ToResponse(testCases))
+	}
+}
+
+func ListModels(modelService service.IListService, logger *logger.Logger) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		answer, err := modelService.List()
+		if err != nil {
+			logger.Error(err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, answer)
 	}
 }

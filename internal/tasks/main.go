@@ -1,6 +1,8 @@
 package tasks
 
 import (
+	"ginProject1/internal/tasks/repository"
+	"ginProject1/internal/tasks/service"
 	"ginProject1/pkg/database/cache"
 	"ginProject1/pkg/database/postgres"
 	"ginProject1/pkg/logger"
@@ -19,7 +21,8 @@ func NewApp() *App {
 func Run() {
 	log := logger.NewLogger()
 	app := NewApp()
-	db, err := postgres.Connect()
+	configPath := "config/tasks.yaml"
+	postgresDb, err := postgres.Connect(configPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,16 +32,18 @@ func Run() {
 		if err != nil {
 			log.Fatal(err)
 		}
-	}(db)
-
-	redisDb, err := cache.Connect()
+	}(postgresDb)
+	redisDb, err := cache.Connect(configPath)
+	defer redisDb.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	app.POST("/", Tasks(db, log, redisDb))
-	app.GET("/test", Test(db, log, redisDb))
-	err = app.Run()
+	repositoryTask := repository.NewTaskRepository(redisDb, postgresDb)
+	serviceNeuron := service.NewNeuronApiServiceService(repositoryTask)
+	serviceList := service.NewListService(repositoryTask)
+	app.POST("/tasks", Tasks(serviceNeuron, log))
+	app.GET("/models", ListModels(serviceList, log))
+	err = app.Run(":8082")
 	if err != nil {
 		log.Fatal(err)
 	}

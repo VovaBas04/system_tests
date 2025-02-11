@@ -1,14 +1,9 @@
 package main
 
-func EstimateValue(value int) string {
-	switch {
-	case value < 10:
-		return "small"
+import "fmt"
 
-	case value < 100:
-		return "medium"
-
-	default:
-		return "big"
-	}
+func main() {
+	fmt.Println("Hello World")
+	select {}
+	fmt.Println("done")
 }

@@ -13,8 +13,8 @@ type PostgresDb struct {
 	sqlx.DB
 }
 
-func getDbByConfigPostgres() (*sqlx.DB, error) {
-	data, err := os.ReadFile("config/tasks.yaml")
+func getDbByConfigPostgres(configName string) (*sqlx.DB, error) {
+	data, err := os.ReadFile(configName)
 	if err != nil {
 		return nil, err
 	}
@@ -31,8 +31,8 @@ func NewPostgresDB(db *sqlx.DB) *PostgresDb {
 	return &PostgresDb{*db}
 }
 
-func Connect() (*PostgresDb, error) {
-	db, err := getDbByConfigPostgres()
+func Connect(configName string) (*PostgresDb, error) {
+	db, err := getDbByConfigPostgres(configName)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err

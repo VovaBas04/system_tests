@@ -1,0 +1,20 @@
+docker:
+  mongo:
+    host: mongo
+    port: 27017
+    username: mongo
+    password: mongo
+    name: codechecker
+  redis:
+    host: cache
+    port: 6379
+localhost:
+  mongo:
+    host: localhost
+    port: 27018
+    username: mongo
+    password: mongo
+    name: codechecker
+  redis:
+    host: localhost
+    port: 6380

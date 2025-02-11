@@ -18,7 +18,7 @@ import (
 	"strings"
 )
 
-type IService interface {
+type INeuronApiService interface {
 	ReadNeuronModelAnswer(response *http.Response) (*postprocess.GigaChatResponse, error)
 	ToResponse(testCases []postprocess.TestCase) []map[string]string
 	Do(gigaChat *neuron_model.GigaChatRequest) (*http.Response, error)

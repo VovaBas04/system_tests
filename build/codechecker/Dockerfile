@@ -12,4 +12,4 @@ RUN go mod tidy
 EXPOSE 8080
 
 # Run the executable
-CMD ["go", "run", "cmd/tasks/main.go"]
+CMD ["go", "run", "cmd/codechecker/main.go"]

@@ -1,17 +1,32 @@
 version: '3'
 
 services:
-  go:
-    build:
-      context:  ../
-      dockerfile:  build/go/Dockerfile
-    networks:
-      - my_network
-    ports:
-      - '8080:8080'
-    volumes:
-      - ..:/tasks
-
+#  tasks:
+#    environment:
+#      ENV : "DEV"
+#    build:
+#      context:  ../
+#      dockerfile: ./build/tasks/Dockerfile
+#    networks:
+#      - my_network
+#  codechecker:
+#    environment:
+#      ENV: "DEV"
+#    build:
+#      context: ../
+#      dockerfile: ./build/codechecker/Dockerfile
+#    networks:
+#      - my_network
+#  api-gateway:
+#    environment:
+#      ENV: "DEV"
+#    build:
+#      context: ../
+#      dockerfile: ./build/api-gateway/Dockerfile
+#    networks:
+#      - my_network
+#    ports:
+#      - '8085:8080'
   postgres:
     image: postgres:latest
     container_name: postgres_container
@@ -25,6 +40,20 @@ services:
       - my_network
     ports:
       - "5436:5432"
+  mongodb:
+    container_name: mongo_db
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+    volumes:
+      - mongodata_codechecker:/data/db
+    restart: always
+    networks:
+      - my_network
+    ports:
+      - "27018:27017"
+
   redis:
     image: docker.io/bitnami/redis:7.4
     environment:
@@ -39,6 +68,8 @@ volumes:
   pgdata_tasks:
     driver: local
   redisdata_tasks:
+    driver: local
+  mongodata_codechecker:
     driver: local
 networks:
   my_network:

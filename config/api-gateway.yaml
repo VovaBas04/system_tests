@@ -1,0 +1,7 @@
+docker:
+  codechecker: "http://codechecker:8080"
+  tasks: "http://tasks:8080"
+localhost:
+  codechecker: "http://localhost:8081"
+  tasks: "http://localhost:8082"
+

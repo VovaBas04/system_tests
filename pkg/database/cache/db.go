@@ -12,10 +12,8 @@ type RedisDb struct {
 	*redis.Client
 }
 
-func getDbByConfig() (*redis.Client, error) {
-	cwd, _ := os.Getwd()
-	log.Print("я тут", cwd)
-	data, err := os.ReadFile("config/tasks.yaml")
+func getDbByConfig(configName string) (*redis.Client, error) {
+	data, err := os.ReadFile(configName)
 	if err != nil {
 		return nil, err
 	}
@@ -32,8 +30,8 @@ func NewRedisDb(db *redis.Client) *RedisDb {
 	return &RedisDb{db}
 }
 
-func Connect() (*RedisDb, error) {
-	db, err := getDbByConfig()
+func Connect(configName string) (*RedisDb, error) {
+	db, err := getDbByConfig(configName)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
