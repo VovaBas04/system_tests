@@ -3,15 +3,14 @@ package tasks
 import (
 	tasks "ginProject1/internal/tasks/neuron_model"
 	"ginProject1/internal/tasks/postprocess"
-	"ginProject1/pkg/database/cache"
-	"ginProject1/pkg/database/postgres"
+	"ginProject1/internal/tasks/service"
 	"ginProject1/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 )
 
-func Tasks(db *postgres.PostgresDb, logger *logger.Logger, redisDb *cache.RedisDb) func(c *gin.Context) {
+func Tasks(service service.IService, logger *logger.Logger) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		request := &PromptRequest{}
 		err := c.ShouldBindJSON(request)
@@ -28,13 +27,13 @@ func Tasks(db *postgres.PostgresDb, logger *logger.Logger, redisDb *cache.RedisD
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		response, err := gigaChatRequest.Do()
+		response, err := service.Do(gigaChatRequest)
 		if err != nil {
 			logger.Error(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		gigaChatResponse, err := ReadNeuronModelAnswer(response)
+		gigaChatResponse, err := service.ReadNeuronModelAnswer(response)
 		log.Println(gigaChatResponse.GetNeuronRawAnswer())
 		if err != nil {
 			logger.Error(err)
@@ -48,18 +47,6 @@ func Tasks(db *postgres.PostgresDb, logger *logger.Logger, redisDb *cache.RedisD
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, ToResponse(testCases))
-	}
-}
-
-func Test(db *postgres.PostgresDb, logger *logger.Logger, redisDb *cache.RedisDb) func(c *gin.Context) {
-	return func(c *gin.Context) {
-		token, err := tasks.GetToken()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"message": token,
-		})
+		c.JSON(http.StatusOK, service.ToResponse(testCases))
 	}
 }
