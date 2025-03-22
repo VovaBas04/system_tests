@@ -10,15 +10,9 @@
     >
       <div class="select-value">
         <div v-if="selectedOption" class="selected-option">
-          <img
-              v-if="selectedOption.icon"
-              :src="selectedOption.icon"
-              :alt="selectedOption.label"
-              class="option-icon"
-          />
-          {{ selectedOption.label }}
+          {{ selectedOption.name }}
         </div>
-        <div v-else class="placeholder">Выберите опцию</div>
+        <div v-else class="placeholder">Выберите нейронную сеть</div>
       </div>
 
       <div class="select-icon">
@@ -46,18 +40,12 @@
         <div class="options-container">
           <button
               v-for="option in props.options"
-              :key="option.value"
+              :key="option.id"
               class="option-item"
               :class="{ 'is-selected': isSelected(option) }"
               @click="selectOption(option)"
           >
-            <img
-                v-if="option.icon"
-                :src="option.icon"
-                :alt="option.label"
-                class="option-icon"
-            />
-            {{ option.label }}
+            {{ option.name}}
             <svg
                 v-if="isSelected(option)"
                 class="check-icon"
@@ -90,7 +78,6 @@ const props = defineProps({
   }
 })
 
-console.log(props.options)
 const emit = defineEmits(['select'])
 
 // Состояния
@@ -122,7 +109,8 @@ const isSelected = (option) => {
 
 <style scoped>
 .select-container {
-  position: relative;
+  position: absolute;
+  top: 80px;
   width: 100%;
 }
 

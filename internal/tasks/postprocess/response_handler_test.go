@@ -1,6 +1,7 @@
 package postprocess
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"os"
@@ -32,12 +33,13 @@ func (s *PostProcessResponseHandlerTestSuite) SetupTest() {
 	err := os.Chdir("../../../")
 	s.Assert().Nil(err)
 	s.response = &MockResponse{}
-	s.response.On("GetNeuronRawAnswer").Return("\"Входные данные: n = 5, k = 3\\\\n- Выходные данные: 10\\\\n\\\\nВходные данные: n = 10, k = 5\\\\n- Выходные данные: 252\\\\n\\\\nВходные данные: n = 50, k = 25\\\\n- Выходные данные: 1225\\\\n\\\\nВходные данные: n = 100, k = 50\\\\n- Выходные данные: 126 \\\\n\\\\nВходные данные: n = 200, k = 100\\\\n- Выходные данные: 19075\\\",\\\"role\\\":\\\"assistant\\\"},\\\"index\\\":0,\\\"finish_reason\\\":\\\"stop\\\"}],\\\"created\\\":1736018556,\\\"model\\\":\\\"GigaChat:1.0.26.20\\\",\\\"object\\\":\\\"chat.completion\\\",\\\"usage\\\":{\\\"prompt_tokens\\\":113,\\\"completion_tokens\\\":147,\\\"total_tokens\\\":260}}\"")
+	s.response.On("GetNeuronRawAnswer").Return("1. **Input:** M = 2, N = 3  \n   - Output: 3  \n2. **Input:** M = 3, N = 2  \n   - Output: 2  \n3. **Input:** M = 4, N = 4  \n   - Output: 4  \n4. **Input:** M = 5, N = 5  \n   - Output: 5  \n5. **Input:** M = 6, N = 6  \n   - Output: 9\",\\\"role\\\":\\\"assistant\\\"},\\\"index\\\":0,\\\"finish_reason\\\":\\\"stop\\\"}],\\\"created\\\":1736018556,\\\"model\\\":\\\"GigaChat:1.0.26.20\\\",\\\"object\\\":\\\"chat.completion\\\",\\\"usage\\\":{\\\"prompt_tokens\\\":113,\\\"completion_tokens\\\":147,\\\"total_tokens\\\":260}}\"")
 	s.response.On("AdditionalLogicToHandleResponse").Return(nil)
 }
 
 func (s *PostProcessResponseHandlerTestSuite) TestLogic() {
-	_, err := GetTestsByResponse(s.response)
+	tests, err := GetTestsByResponse(s.response)
+	fmt.Println(tests)
 	s.Assert().Nil(err)
 }
 

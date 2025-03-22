@@ -1,28 +1,32 @@
 <script setup>
 
 import SelectModels from "@/components/SelectModels.vue";
-import {onBeforeMount} from "vue";
+import {defineEmits, onBeforeMount, ref} from "vue";
 
-let options = []
+let options = ref([])
 onBeforeMount(() => {
   console.log(process.env.VUE_APP_BACKEND_URL + '/models')
   fetch(process.env.VUE_APP_BACKEND_URL + '/models', {
     method: "GET",
-    mode: "no-cors",
-    headers: {
-      'Content-Type': 'application/json', // Тип содержимого
-    },
-  }).then(response => response.json()).then(data => {
-    console.log(data)
-    options = data
+    mode: "cors",
+     headers: {
+      'Content-Type': 'application/json',
+     },
+  }).then(response => response.json()).then(responseData => {
+    options.value = responseData.data
   })
 })
+
+const emit = defineEmits(['select'])
+
+const emitSelect = (value) => {
+  emit("select", value)
+}
 </script>
 
 <template>
-<SelectModels :options="options"/>
+<SelectModels :options="options" :key="options" @select="emitSelect"/>
 </template>
 
 <style scoped>
-
 </style>

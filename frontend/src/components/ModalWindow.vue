@@ -21,8 +21,7 @@
         </div>
 
         <div class="modal-content">
-          <slot>
-          </slot>
+          <CodeEditor @update:code="setCode"/>
           <SendButton style="top: -5%" @click="changeState"/>
         </div>
       </div>
@@ -36,6 +35,7 @@ import {watch, onMounted, onUnmounted, defineProps, ref} from 'vue'
 import CheckCodeLink from "@/components/CheckCodeLink.vue";
 import NeuronAnswer from "@/components/NeuronAnswer.vue";
 import SendButton from "@/components/SendButton.vue";
+import CodeEditor from "@/components/CodeEditor.vue";
 
 const props = defineProps({
   modelValue: {
@@ -49,29 +49,66 @@ const props = defineProps({
   hidden : {
     type: Boolean,
     default: true
+  },
+  tests : {
+    type: Array,
+    default: () => []
   }
 })
-console.log("Окей")
 const isOpen = ref(false)
 
-const answer = ref("error")
+const answer = ref("hidden")
+
+const convertToResponse = (tests)  => {
+  let testsResponse = []
+  for (let test of tests) {
+    let variables = test.field1.split(';')
+    let testResponse = {}
+    for (let variable of variables) {
+      let key, value;
+      [key, value] = variable.split('=')
+      testResponse[key] = value
+    }
+    testResponse['answer'] = test.field2
+    testsResponse.push(testResponse)
+  }
+
+  return testsResponse
+}
+
+let code = ''
 
 const changeState = () => {
-  if (answer.value === 'ok') {
-    answer.value = 'error'
-  } else if (answer.value === 'error'){
-    answer.value = 'hidden'
-  } else {
-    answer.value = 'ok'
-  }
+  fetch(process.env.VUE_APP_BACKEND_URL + "/check", {
+    method: "POST",
+    mode: "cors",
+    body: JSON.stringify({
+      tests: convertToResponse(props.tests),
+      code: code
+    }),
+    headers : {
+      "Content-Type" : "application/json"
+    }
+  }).then(response => response.json()).then(data => {
+    if (data.ok === true) {
+      answer.value = 'ok'
+    } else {
+      answer.value = 'error'
+    }
+  })
 }
 
 const closeModal = () => {
+  answer.value = 'hidden'
   isOpen.value = false
 }
 
 const openModal = () => {
   isOpen.value = true
+}
+
+const setCode = (value) => {
+  code = value
 }
 
 const handleEscape = (e) => {

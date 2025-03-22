@@ -6,7 +6,7 @@ import (
 	"ginProject1/internal/tasks/config"
 )
 
-var Format = "Входные данные: переменная = значение - Выходные данные: результат. Входные данные разделяй запятой."
+var Format = "\"Input: переменная1 = значение1, переменная2 = значение2, ..., переменнаяN = значениеN - Output: результат\". Input данные разделяй запятой. Input от Output разделяй тире. Нужно точное соответствие заданному формату без лишней информации!"
 
 type GigaChatRequest struct {
 	Model     string
@@ -29,8 +29,12 @@ func (gigaChat *GigaChatRequest) GeneratePrompt(task string, constraints map[str
 	if err != nil {
 		return err
 	}
+	if conditions != "" {
+		conditions = " Ограничения на входные переменные -" + conditions
+	}
 
-	gigaChat.Prompt = fmt.Sprintf("Сгенерируй %d наборов тестовых данных для проверки задачи в формате: %s. Текст данной задачи - %s. Ограничения на входные переменные - %s", count, Format, task, conditions)
+	gigaChat.Prompt = fmt.Sprintf("Сгенерируй наборы тестовых данных для проверки задачи в формате: %s.\"%s\". %s. Количество тестов должны быть равным - %d", Format, task, conditions, count)
+
 	return nil
 }
 
@@ -50,11 +54,7 @@ func (gigaChat *GigaChatRequest) SetAdditionalFields(args ...interface{}) error 
 }
 
 func (gigaChat *GigaChatRequest) PreparedRequest(task string, constraints map[string]map[Constraint]string) error {
-	err := gigaChat.SetModel("GigaChat")
-	if err != nil {
-		return err
-	}
-	err = gigaChat.SetAdditionalFields(5000)
+	err := gigaChat.SetAdditionalFields(5000)
 	if err != nil {
 		return err
 	}
@@ -63,5 +63,6 @@ func (gigaChat *GigaChatRequest) PreparedRequest(task string, constraints map[st
 	if err != nil {
 		return err
 	}
+	
 	return nil
 }

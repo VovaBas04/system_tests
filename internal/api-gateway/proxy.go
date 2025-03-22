@@ -1,10 +1,11 @@
 package api_gateway
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -39,28 +40,43 @@ func (proxy *Proxy) proxyHandler(c *gin.Context) {
 	}
 
 	// Создаем новый запрос к целевому серверу
-	req, err := http.NewRequest(c.Request.Method, targetURL, c.Request.Body)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Ошибка создания запроса")
-		return
-	}
 
-	// Копируем заголовки оригинального запроса
-	for key, value := range c.Request.Header {
-		req.Header[key] = value
-	}
-
-	// Выполняем запрос
+	retry := NewRetry()
 	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		c.String(http.StatusServiceUnavailable, "Ошибка доступа к серверу")
+	ByteBody, _ := io.ReadAll(c.Request.Body)
+	resp := retry.Exec(func() (*http.Response, bool) {
+		req, err := http.NewRequest(c.Request.Method, targetURL, io.NopCloser(bytes.NewBuffer(ByteBody)))
+		if err != nil {
+			fmt.Println(err, "Req")
+			return nil, false
+		}
+
+		// Копируем заголовки оригинального запроса
+		for key, value := range c.Request.Header {
+			req.Header[key] = value
+		}
+
+		response, err := client.Do(req)
+
+		if err != nil {
+			fmt.Println(err, "Resp")
+			return nil, false
+		}
+
+		if response.StatusCode == http.StatusInternalServerError {
+			return response, true
+		}
+
+		return response, false
+	})
+	if resp == nil {
+		c.String(http.StatusServiceUnavailable, "Ошибка доступа")
 		return
 	}
 	defer resp.Body.Close()
 
 	// Читаем ответ от целевого сервера
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 
 	// Устанавливаем статус код и заголовки из ответа
 	c.Writer.WriteHeader(resp.StatusCode)

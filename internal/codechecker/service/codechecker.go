@@ -44,6 +44,7 @@ func (service *Service) CheckCode(code string, tests []map[string]string) (bool,
 
 	for i := 0; i < len(tests); i++ {
 		go func() {
+			defer wg.Done()
 			cmd := exec.Command("python3", fileName)
 			var stdin bytes.Buffer
 
@@ -60,13 +61,13 @@ func (service *Service) CheckCode(code string, tests []map[string]string) (bool,
 				return
 			}
 			ch <- string(output) == tests[i]["answer"]
-			wg.Done()
 		}()
 	}
 
 	ok := true
 	for i := 0; i < len(tests); i++ {
 		if <-ch == false {
+			fmt.Println("Тут")
 			ok = false
 		}
 	}

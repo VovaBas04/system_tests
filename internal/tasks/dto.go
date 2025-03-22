@@ -7,12 +7,14 @@ import (
 
 type PromptDto struct {
 	task        string
+	model       string
 	constraints map[string]map[neuron_model.Constraint]string
 }
 
 func ConvertRequestToDtoConstraint(request *PromptRequest) *PromptDto {
 	promptDto := &PromptDto{}
 	promptDto.task = request.Prompt
+	promptDto.model = request.Model
 	result := make(map[string]map[neuron_model.Constraint]string)
 	for _, constraints := range request.Params {
 		if _, ok := result[constraints.Variable]; !ok {

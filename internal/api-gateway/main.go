@@ -14,6 +14,7 @@ func NewApp() *App {
 		gin.Default(),
 	}
 }
+
 func Run() {
 	log := logger.NewLogger()
 	app := NewApp()
@@ -26,6 +27,7 @@ func Run() {
 	}
 
 	proxy := NewProxy(config)
+	app.Use(CORSMiddleware())
 	app.Any("/*path", proxy.proxyHandler)
 
 	err = app.Run(":8080")

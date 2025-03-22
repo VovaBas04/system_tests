@@ -16,26 +16,33 @@ func Tasks(taskService service.INeuronApiService, logger *logger.Logger) func(c 
 		if err != nil {
 			logger.Error(err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
 			return
 		}
 		gigaChatRequest := tasks.NewGigaChatRequest()
 		dto := ConvertRequestToDtoConstraint(request)
 		err = gigaChatRequest.PreparedRequest(dto.task, dto.constraints)
+		_ = gigaChatRequest.SetModel(dto.model)
 		if err != nil {
 			logger.Error(err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
 			return
 		}
+
 		response, err := taskService.Do(gigaChatRequest)
 		if err != nil {
 			logger.Error(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
 			return
 		}
+
 		gigaChatResponse, err := taskService.ReadNeuronModelAnswer(response)
 		if err != nil {
 			logger.Error(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
 			return
 		}
 
@@ -48,8 +55,10 @@ func Tasks(taskService service.INeuronApiService, logger *logger.Logger) func(c 
 		if err != nil {
 			logger.Error(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
 			return
 		}
+
 		c.JSON(http.StatusOK, taskService.ToResponse(testCases))
 	}
 }

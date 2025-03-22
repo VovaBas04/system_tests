@@ -9,38 +9,28 @@
   </div>
 </template>
 
-<script>
-import { ref, onMounted } from 'vue';
+<script setup>
+import { ref, onMounted, defineEmits} from 'vue';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism.css';
 import 'prismjs/components/prism-python';
 
-export default {
-  name: 'CodeEditor',
-  setup() {
-    const code = ref('// Введите ваш код здесь');
-    const highlight = ref(600);
-    const editorHeight = ref(600);
+const emit = defineEmits(["update:code"])
+const code = ref('');
+const highlight = ref(600);
+const editorHeight = ref(600);
 
-    const highlightCode = () => {
-      if (highlight.value) {
-        highlight.value.textContent = code.value;
-        Prism.highlightElement(highlight.value);
-      }
-    };
-
-    onMounted(() => {
-      highlightCode();
-    });
-
-    return {
-      code,
-      highlight,
-      highlightCode,
-      editorHeight,
-    };
-  },
+const highlightCode = () => {
+  if (highlight.value) {
+    emit("update:code", code.value)
+    highlight.value.textContent = code.value;
+    Prism.highlightElement(highlight.value);
+  }
 };
+
+onMounted(() => {
+  highlightCode();
+});
 </script>
 
 <style scoped>
@@ -57,7 +47,6 @@ textarea {
   height: 100%;
   resize: vertical;
   padding-top: 10px;
-  font-size: 14px;
   line-height: 1.5;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -79,7 +68,7 @@ pre {
   line-height: 1.5;
   pointer-events: none;
   overflow: hidden;
-  background-color: rgba(245, 245, 245);
+  background-color: rgba(245, 245, 245, 0) !important;
   font-family: 'Arial', sans-serif;
 }
 

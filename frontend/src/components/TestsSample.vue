@@ -5,9 +5,10 @@
       <div class="input-group">
         <input
             type="text"
-            v-model="fields[i-1].field1"
+            :value="fields[i-1].field1"
             placeholder="Введите значение"
             class="custom-input"
+            @input = "editFields($event, i-1, 'field1')"
         >
         <label class="floating-label">Входные Данные {{i}}</label>
       </div>
@@ -17,9 +18,10 @@
       <div class="input-group">
         <input
             type="text"
-            v-model="fields[i-1].field2"
+            :value="fields[i-1].field2"
             placeholder="Введите значение"
             class="custom-input"
+            @input="editFields($event, i-1, 'field2')"
         >
         <label class="floating-label">Выходные данные {{i}}</label>
       </div>
@@ -28,20 +30,35 @@
 </template>
 
 <script setup>
-import {reactive, defineProps} from 'vue'
+
+import {defineProps, defineEmits, computed, ref} from 'vue'
 const arr = [1,2,3,4,5]
-const fields = reactive([
-  { field1: '', field2: '' },
-  { field1: '', field2: '' },
-  { field1: '', field2: '' },
-  { field1: '', field2: '' },
-  { field1: '', field2: '' }
-])
 
 const props = defineProps({
-  hidden : Boolean
+  hidden : Boolean,
+  fields : {
+    type: Array,
+    default: () => []
+  }
 })
 
+const inputRef = ref(null)
+const inputFields = computed({
+  get : () => {
+    return inputRef.value ?? props.fields
+  },
+  set : (value) => {
+    inputRef.value = value
+  }
+})
+
+const emit = defineEmits("update:fields")
+const editFields = (event, i, field) => {
+  let elem = inputFields.value
+  elem[i][field] = event.target.value
+  inputFields.value = elem
+  emit("update:fields", inputFields.value)
+}
 </script>
 
 <style scoped>

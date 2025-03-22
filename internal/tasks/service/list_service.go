@@ -3,7 +3,7 @@ package service
 import "ginProject1/internal/tasks/repository"
 
 type IListService interface {
-	List() ([]Model, error)
+	List() (*ModelResponse, error)
 }
 
 type ListService struct {
@@ -16,7 +16,7 @@ func NewListService(repository repository.IRepository) *ListService {
 	}
 }
 
-func (s *ListService) List() ([]Model, error) {
+func (s *ListService) List() (*ModelResponse, error) {
 	models, err := s.repository.ListModels()
 	if err != nil {
 		return nil, err
@@ -37,11 +37,21 @@ func NewModel(id int, name string) Model {
 	}
 }
 
-func (s *ListService) convertToApiModel(models []repository.Model) []Model {
+type ModelResponse struct {
+	Models []Model `json:"data"`
+}
+
+func NewModelResponse(models []Model) *ModelResponse {
+	return &ModelResponse{
+		Models: models,
+	}
+}
+
+func (s *ListService) convertToApiModel(models []repository.Model) *ModelResponse {
 	var answer []Model
 	for _, model := range models {
 		answer = append(answer, NewModel(model.Id, model.Name))
 	}
 
-	return answer
+	return NewModelResponse(answer)
 }

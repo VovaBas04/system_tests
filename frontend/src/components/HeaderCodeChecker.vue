@@ -8,10 +8,9 @@
 
       <!-- Desktop Navigation -->
       <nav class="nav-desktop">
-        <a href="#features" class="nav-link">Features</a>
-        <a href="#pricing" class="nav-link">Pricing</a>
-        <a href="#docs" class="nav-link">Documentation</a>
-        <a href="#about" class="nav-link">About</a>
+        <a href="/" class="nav-link">Главная</a>
+        <a href="/rules" class="nav-link">Правила</a>
+        <a href="/docs" class="nav-link">Документация</a>
       </nav>
 
       <!-- Auth Buttons - Desktop -->
