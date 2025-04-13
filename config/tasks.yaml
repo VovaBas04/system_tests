@@ -18,5 +18,5 @@ localhost:
   redis:
     host: localhost
     port: 6380
-secret-token: ZmYwMTYzM2MtMzY0ZS00NzQ3LThjOGMtMjBjZjdhZTI0NmYzOjY5MjVmOTU3LWFjOTUtNGJlOC1iZGRkLTgxZTliMGE2ZDdlOQ==
+secret-token: this_secret_token
 testcase: 5
